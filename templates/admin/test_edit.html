@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}{{ test.title_ru }} — Вопросы{% endblock %}
+{% block content %}
+<div class="container" style="max-width:960px;">
+  <h1>{{ test.subject_name or test.title_ru }}</h1>
+  <p>Тип: один правильный ответ · <a href="{{ url_for('admin_content') }}">Назад</a></p>
+  <div class="card">
+    <div class="card-title">Добавить вопрос вручную</div>
+    <form method="POST">
+      <input type="hidden" name="q_type" value="mcq">
+      <div class="form-group"><label>Вопрос</label><textarea name="q_ru" rows="2" required></textarea></div>
+      <div class="form-group"><label>A</label><input name="opt_a" required></div>
+      <div class="form-group"><label>B</label><input name="opt_b" required></div>
+      <div class="form-group"><label>C</label><input name="opt_c"></div>
+      <div class="form-group"><label>D</label><input name="opt_d"></div>
+      <div class="form-group"><label>Правильный ответ</label>
+        <select name="correct" required>
+          <option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" type="submit">Добавить</button>
+    </form>
+  </div>
+  <div class="card">
+    <div class="card-title">Загрузить из файла</div>
+    <form method="POST" action="{{ url_for('admin_test_import', code=test.code) }}" enctype="multipart/form-data">
+      <input type="file" name="file" accept=".txt,.csv,.json,.docx,.text" required>
+      <button class="btn btn-primary" type="submit" style="margin-top:10px;">Загрузить</button>
+    </form>
+  </div>
+  <div class="card">
+    <div class="card-title">Опубликовать</div>
+    <form method="POST" action="{{ url_for('admin_test_publish', code=test.code) }}">
+      <div class="form-group"><label>Предмет</label><input name="subject_name" value="{{ test.subject_name or test.title_ru }}"></div>
+      <div class="form-group"><label>Начало</label><input type="datetime-local" name="exam_start" value="{{ test.exam_start or '' }}"></div>
+      <div class="form-group"><label>Конец</label><input type="datetime-local" name="exam_end" value="{{ test.exam_end or '' }}"></div>
+      <div class="form-group"><label>Факультеты</label>
+        {% for f in faculties %}
+        <label style="display:block;font-weight:normal;"><input type="checkbox" name="faculty_ids" value="{{ f.id }}"> {{ f.name_ru }}</label>
+        {% endfor %}
+      </div>
+      <button class="btn btn-accent" type="submit">Опубликовать</button>
+    </form>
+  </div>
+  <div class="card">
+    <div class="card-title">Вопросы ({{ questions|length }})</div>
+    {% for q in questions %}
+    <div style="padding:10px 0;border-bottom:1px solid var(--border);">
+      <strong>{{ loop.index }}. {{ q.q_ru }}</strong>
+      <div style="font-size:.85rem;color:var(--text-muted);">
+        A) {{ q.opt_a }} · B) {{ q.opt_b }}{% if q.opt_c %} · C) {{ q.opt_c }}{% endif %}{% if q.opt_d %} · D) {{ q.opt_d }}{% endif %}
+        · <b>Ответ: {{ ['A','B','C','D'][q.correct_index] if q.correct_index is not none else '?' }}</b>
+      </div>
+      <form method="POST" action="{{ url_for('admin_question_delete', qid=q.id) }}" onsubmit="return confirm('Удалить?');">
+        <button class="btn btn-danger btn-sm" type="submit">Удалить</button>
+      </form>
+    </div>
+    {% else %}<p>Добавьте вопросы</p>{% endfor %}
+  </div>
+</div>
+{% endblock %}

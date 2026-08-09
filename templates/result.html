@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Результат — Донояк TJ{% endblock %}
+{% block content %}
+<div class="container" style="max-width:720px;">
+  <div class="page-header">
+    <h1>{% if lang == 'en' %}Result{% elif lang == 'tg' %}Натиҷа{% else %}Результат{% endif %}</h1>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div style="font-size:3rem;font-weight:800;color:var(--primary);">{{ grade }}</div>
+    <p style="font-size:1.1rem;margin:8px 0;">
+      <strong>{% if lang == 'en' %}Subject{% else %}Предмет{% endif %}:</strong>
+      {{ test.title.ru if test and test.title else result.test_id }}
+    </p>
+    <p style="font-size:1.2rem;margin:8px 0;">{{ result.score }} / {{ result.max_score }} {% if lang == 'en' %}points{% else %}баллов{% endif %}</p>
+    <p>{% if lang == 'en' %}Correct{% else %}Верные{% endif %}: {{ result.correct }} · {% if lang == 'en' %}Wrong{% else %}Неверные{% endif %}: {{ result.incorrect }}</p>
+    <p style="color:var(--text-muted);font-size:.9rem;">
+      {% if lang == 'en' %}Date{% else %}Дата сдачи{% endif %}: {{ result.created_at[:16] if result.created_at else '' }}
+      {% if result.duration_seconds %} · {% if lang == 'en' %}Time{% else %}Время{% endif %}: {{ result.duration_seconds }} сек{% endif %}
+    </p>
+    <p style="color:var(--text-muted);font-size:.85rem;">A 80–100 · B 60–79 · C 40–59 · D 0–39</p>
+  </div>
+  <a href="{{ url_for('dashboard') }}" class="btn btn-primary">На главную</a>
+</div>
+{% endblock %}

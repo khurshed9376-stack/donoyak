@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Мои результаты — Донояк TJ{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <h1>{% if lang == 'en' %}My results{% else %}Мои результаты{% endif %}</h1>
+  </div>
+  <div class="card" style="overflow-x:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Предмет</th>
+          <th>Оценка</th>
+          <th>Балл</th>
+          <th>Верные</th>
+          <th>Неверные</th>
+          <th>Дата сдачи</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for r in rows %}
+      {% set pct = ((r.score / r.max_score * 100) if r.max_score else 0)|round(1) %}
+      {% set gr = r.grade if r.grade else ('A' if pct >= 80 else ('B' if pct >= 60 else ('C' if pct >= 40 else 'D'))) %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ tests[r.test_id].title.ru if r.test_id in tests else r.test_id }}</td>
+        <td><strong>{{ gr }}</strong></td>
+        <td>{{ r.score }} / {{ r.max_score }}</td>
+        <td>{{ r.correct }}</td>
+        <td>{{ r.incorrect }}</td>
+        <td>{{ r.created_at[:16] if r.created_at else '' }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7">Пока нет результатов</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

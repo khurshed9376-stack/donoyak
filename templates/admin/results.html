@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Результаты экзаменов — Админ{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <h1>Результаты экзаменов</h1>
+    <p><a href="{{ url_for('admin_dashboard') }}">Назад в панель</a></p>
+  </div>
+  <p>
+    <a class="btn btn-primary btn-sm" href="{{ url_for('admin_export_results') }}">Скачать Excel</a>
+    <a class="btn btn-primary btn-sm" href="{{ url_for('admin_results_pdf') }}">Скачать PDF</a>
+  </p>
+  <div class="card" style="overflow-x:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Студент</th><th>Предмет</th><th>Оценка</th><th>Балл</th>
+          <th>Верные</th><th>Неверные</th><th>Время (сек)</th><th>Дата</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in results %}
+        {% set pct = ((r.score / r.max_score * 100) if r.max_score else 0)|round(1) %}
+        {% set gr = r.grade if r.grade else ('A' if pct >= 80 else ('B' if pct >= 60 else ('C' if pct >= 40 else 'D'))) %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ r.full_name }}</td>
+          <td>{{ tests[r.test_id].title.ru if r.test_id in tests else r.test_id }}</td>
+          <td><strong>{{ gr }}</strong></td>
+          <td>{{ r.score }} / {{ r.max_score }}</td>
+          <td>{{ r.correct }}</td>
+          <td>{{ r.incorrect }}</td>
+          <td>{{ r.duration_seconds or 0 }}</td>
+          <td>{{ r.created_at[:16] if r.created_at else '' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="9">Нет результатов</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
